@@ -1,0 +1,6 @@
+@KH.Lab.NomadLab_HostAddress = http://localhost:5041
+
+GET {{KH.Lab.NomadLab_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  nomad-server:
+    image: hashicorp/nomad:latest
+    command: agent -server -bootstrap-expect=1 -data-dir=/nomad/data -bind=0.0.0.0
+    volumes:
+      - nomad-server-data:/nomad/data
+    networks:
+      - nomad-network
+    ports:
+      - "4646:4646"   # HTTP API
+      - "4647:4647"   # RPC
+      - "4648:4648"   # Serf
+    environment:
+      - NOMAD_BIND_ADDR=0.0.0.0
+
+  nomad-client:
+    image: hashicorp/nomad:latest
+    command: agent -client -data-dir=/nomad/data -bind=0.0.0.0 -network-interface=eth0
+    volumes:
+      - nomad-client-data:/nomad/data
+    networks:
+      - nomad-network
+    depends_on:
+      - nomad-server
+    environment:
+      - NOMAD_BIND_ADDR=0.0.0.0
+      - NOMAD_SERVERS=nomad-server:4647   # 指定 Nomad Server 地址
+
+volumes:
+  nomad-server-data:
+  nomad-client-data:
+
+networks:
+  nomad-network:
+    driver: bridge
